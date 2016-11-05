@@ -158,5 +158,10 @@ for (var i = 1; i <= 2; i++) {
     });
     newSeat.save();
 }*/
+User.findOne({email: 'admin'}).exec((err, user) => {
+    if (!user) {
+        new User({email: 'admin', password: 'admin'}).save();
+    }
+});
 
 module.exports = app;
