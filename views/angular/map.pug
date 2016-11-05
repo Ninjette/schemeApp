@@ -1,0 +1,172 @@
+div
+	// Header block
+	header.header
+		.wrapper.header__content
+			.logo
+				img.logo__media(src='img/logo.svg', alt='logo')
+			.header__inner-wrap.clearfix
+				.auth
+					if (!user)
+						a.auth__btn.auth__btn--login.button(href='#/auth') Login
+					else
+						a.auth__btn.auth__btn--logout.button(href='/logout')
+							i.icon-exit.auth__icon
+							| Logout
+				if (user)
+					button.add-user(ng-click='openUserForm()')
+						i.add-user__icon.icon-plus
+						span Add new user
+					form.user-form(ng-show='showUserForm', ng-submit='addUser(user)')
+						.btn-close.icon-cancel-sign(ng-click='showUserForm=false')
+						fieldset.user-form__fieldset
+							label.user-form__label(for='name-input') Name
+							input#name-input.user-form__input(type='text', ng-model='user.name', placeholder='John Johnson', name='name')
+						fieldset.user-form__fieldset
+							label.user-form__label(for='email-input') E-mail
+							input#email-input.user-form__input(type='email', required='', placeholder='example@gmail.com', ng-model='user.email', name='email')
+						button.user-form__submit.button.button--inversion(type='submit') Add user
+				.seats-block
+					if user
+						button.add-seat(ng-click='createSeat()')
+							i.add-seat__icon.icon-plus
+							span.add-seat__text Create new seat
+					.seats-instruction(ng-show='newSeatMode')
+						| Choose spot on the map for new seat. Press
+						.button-wrap
+							button.button-special(ng-click='newSeatMode = false') Esc
+						| in order to cancel creating new seat
+					.seat-info(ng-show='showSeatInfo')
+						.seat-info__close.btn-close.icon-cancel-sign(ng-click='closeSeatInfo()')
+						.seat-info__icon seat icon
+						.seat-info__details
+							fieldset.seat-info__fieldset
+								span.seat-info__key Seat title:
+								if user
+									span.seat-info__value(ng-click='editingTitle = true', ng-hide='editingTitle', title='change title') {{seatTitle|| 'No title'}}
+									input.seat-info__input(type='text', ng-model='seatTitle', ng-show='editingTitle', ng-blur='blurTitle(seatTitle)')
+								else
+									span.seat-info__value.no-active {{seatTitle}}
+
+							fieldset.seat-info__fieldset
+								span.seat-info__key Occupant:
+								if user
+									span.seat-info__value(ng-click='editingOccupant = true; rememberOldOccupant()', ng-hide='editingOccupant', title='change occupant') {{seatOccupant != null ? seatOccupant : 'Free'}}
+								else
+									span.seat-info__value.no-active {{seatOccupant != null ? seatOccupant : 'Free'}}
+
+								if user
+									i.seat-info__delete.icon-cancel-sign(ng-show="seatOccupant != null && !editingOccupant", ng-click='makeFreeSeatModal = true', title='make this place free')
+								.seat-info__input-wrap(ng-show='editingOccupant')
+									i.icon-search.seat-info__sign
+									input.seat-info__input(type='text', ng-model='seatOccupant', ng-change='searchChanged(seatOccupant)')
+								.persons(ng-show='showHints && editingOccupant')
+									.persons__triangle
+									p.persons__default-value no matches
+									.person(ng-repeat='person in persons | filter:seatOccupant | filter:{seatId: null}', ng-click='assignNewOccupant(person)')
+										| {{person.name}}
+							.make-free-confirmation.window(ng-show='makeFreeSeatModal')
+								i.btn-close.icon-cancel-sign(ng-click='makeFreeSeatModal=false')
+								.window__content
+									p.window__text
+										| Do you really want to make this
+										| seat free?
+									button.window__btn.button.button--inversion(ng-click='makeFreeSeatModal = false; makeSeatFree()')
+										| Yes
+									button.window__btn.button.button--inversion(ng-click='makeFreeSeatModal=false')
+										| No
+						if user
+							button.seat-info__btn.button.button--inversion(ng-click='confirmationDeleteSeat = true')
+								| Delete seat
+						.delete-confirmation.window(ng-show='confirmationDeleteSeat')
+							i.btn-close.icon-cancel-sign(ng-click='confirmationDeleteSeat=false')
+							.window__content
+								p.window__text
+									| Do you really want to delete this
+									| seat?
+								button.window__btn.button.button--inversion(ng-click='deleteSeat(); confirmationDeleteSeat=false')
+									| Yes
+								button.window__btn.button.button--inversion(ng-click='confirmationDeleteSeat=false')
+									| No
+				form.search
+					fieldset.search__input-wrap
+						i.search__icon.icon-search
+						input.search__input(type='text', ng-model='searchUser', placeholder='Search', ng-change='searchUsersChanged(searchUser)', ng-focus='searchUsersChanged(searchUser)')
+						.search__variants(ng-show='showUsers')
+							.search__triangle
+							p.search__default-value no matches
+							p.search__variant(ng-repeat='person in persons | filter:searchUser | filter:{seatId: filterFree}', ng-click='focussedPerson(person)') {{person.name}}
+					fieldset.search__checkbox-wrap
+						input#checkbox01(type='checkbox', ng-model='freeOnly', ng-click='changeFilter()', name='checkbox')
+						label(for='checkbox01') Without seat
+				// person popup
+				.person-info(ng-show='personInfo')
+					.window__close.btn-close.icon-cancel-sign(ng-click='personInfo = false')
+					.person-info__media-wrap
+						img.person-info__media(src='img/person2.jpg', alt='person photo')
+					.person-info__details
+						.person-info__elem
+							span.person-info__key Occupant name:
+							span.person-info__value {{currentUser.name}}
+						.person-info__elem
+							span.person-info__key Occupant email:
+							span.person-info__value {{currentUser.email}}
+						.person-info__elem
+							span.person-info__key Occupant seat:
+							span.person-info__value {{currentUser.seatId != null ? currentUser.seatId : 'Free'}}
+							if user
+								i.person-info__delete.icon-cancel-sign(ng-click='makeFreeModal = true', title='make this person free', ng-show="currentUser.seatId")
+							.window.modal-confirm(ng-show='makeFreeModal')
+								i.btn-close.icon-cancel-sign(ng-click='makeFreeModal = false')
+								.window__content
+									.window__text.assign-modal__text
+										| Would you really like to make
+										| {{currentUser.name}} free ?
+									button.button.button--inversion.modal-confirm__btn(ng-click='removeFromPlace(); makeFreeModal = false')
+										| Yes
+									button.button.button--inversion.modal-confirm__btn(ng-click='makeFreeModal = false')
+										| No
+							if user
+								button.person-info__btn.button.button--inversion(ng-click='selectionMode = true')
+									| Assign
+							.assign-modal.window(ng-show='assignModal')
+								i.btn-close.icon-cancel-sign(ng-click='assignModal = false')
+								div(ng-hide='userWithoutSeat')
+									.window__content
+										.window__text.assign-modal__text
+											| This place is already occupied.
+											| Would you like to swap {{currentUser.name}} and {{currentPlace.occupant}}
+											| or you want to replace {{currentPlace.occupant}} ?
+										button.assign-modal__btn.button.button--inversion(ng-click='swapPersons()')
+											| Swap
+										button.assign-modal__btn.button.button--inversion(ng-click='replacePerson()')
+											| Replace
+								div(ng-show='userWithoutSeat')
+									.window__content
+										.window__text.assign-modal__text
+											| This place is already occupied.
+											| Would you like to replace {{currentPlace.occupant}} ?
+										button.assign-modal__btn.button.button--inversion(ng-click='replacePerson()')
+											| Replace
+							.hz-modal.window(ng-show='assignNewModal')
+								i.btn-close.icon-cancel-sign(ng-click='assignNewModal = false')
+								div
+									.window__content
+										.window__text.assign-modal__text
+											p.window__success
+												| Done!
+											| Would you like to assign new place for {{replacedPerson.name}} ?
+										button.assign-modal__btn.button.button--inversion(ng-click='assignNewSeat()')
+											| Yes
+										button.assign-modal__btn.button.button--inversion(ng-click='assignNewModal = false')
+											| No
+	.floor-plan-wrapper
+		.selection-mode(ng-show='selectionMode')
+			p.selection-mode__title selection mode
+			.selection-mode__description
+				| Choose seat for {{currentUser.name}}. Press
+				.button-wrap
+					button.button-special(ng-click='selectionMode = false') Esc
+				| to close selection mode
+		.floor-plan
+			img.floor-plan__media(src='img/floor.svg', alt='floor-plan')
+			canvas#canvas-block(width='1000', height='520')

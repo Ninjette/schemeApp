@@ -1,0 +1,16 @@
+header.header-block
+	.wrapper
+		.logo
+			img.logo__media(src='img/logo.svg', alt='logo')
+		a.button.button--margin.pull-right(href='#/') Floor plan
+.auth-wrap
+	.wrapper
+		p.auth-wrap__title Authentication
+		form.auth-form(action='/login', method='post')
+			fieldset.auth-form__fieldset
+				i.auth-form__icon.icon-user
+				input.auth-form__input(type='text', placeholder='Username', name='email', required='')
+			fieldset.auth-form__fieldset
+				i.auth-form__icon.icon-locked
+				input.auth-form__input(type='password', placeholder='Password', name='password', required='')
+			button.auth-form__submit(type='submit') Let’s go

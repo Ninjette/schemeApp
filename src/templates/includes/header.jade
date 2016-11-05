@@ -1,0 +1,143 @@
+//Header block
+header.header
+	.wrapper.header__content
+		.logo
+			img(src="img/logo.svg", alt="logo").logo__media
+		.header__inner-wrap.clearfix
+			.auth
+				a(href="#/auth").auth__btn.auth__btn--login.button
+					|Login
+				button.auth__btn.auth__btn--logout.button.hidden
+					i.icon-exit.auth__icon
+					|Logout
+			button.add-user(ng-click="openUserForm()")
+				i.add-user__icon.icon-plus
+				span Add new user
+			form.user-form(ng-show="showUserForm", ng-submit="addUser(user)")
+				.btn-close.icon-cancel-sign(ng-click="showUserForm=false")
+				fieldset.user-form__fieldset
+					label(for="name-input").user-form__label Name
+					input(type="text", ng-model="user.name", placeholder="John Johnson", id="name-input", name="name").user-form__input
+
+				fieldset.user-form__fieldset
+					label(for="email-input").user-form__label E-mail
+					input(type="email", required, placeholder="example@gmail.com", ng-model="user.email" id="email-input", name="email").user-form__input
+				button(type="submit").user-form__submit.button.button--inversion Add user
+	
+	
+			.seats-block
+				button.add-seat(ng-click="createSeat()")
+					i.add-seat__icon.icon-plus
+					span.add-seat__text Create new seat
+				.seats-instruction(ng-show="newSeatMode") 
+					|Choose spot on the map for new seat. Press
+					.button-wrap
+						button.button-special(ng-click="newSeatMode = false") Esc
+					|in order to cancel creating new seat
+	
+				.seat-info(ng-show="showSeatInfo")
+					.seat-info__close.btn-close.icon-cancel-sign(ng-click="closeSeatInfo()")
+					.seat-info__icon seat icon
+					.seat-info__details
+						fieldset.seat-info__fieldset
+							span.seat-info__key Seat title: 
+							span.seat-info__value(ng-click="editingTitle = true", ng-hide="editingTitle", title="change title") {{seatTitle|| 'No title'}}
+							input(type="text",ng-model="seatTitle", ng-show="editingTitle", ng-blur="editingTitle = false").seat-info__input
+						fieldset.seat-info__fieldset
+							span.seat-info__key Occupant: 
+							span.seat-info__value(ng-click="editingOccupant = true; rememberOldOccupant()", ng-hide="editingOccupant", title="change occupant") {{seatOccupant|| 'Free'}}
+							i.seat-info__delete.icon-cancel-sign(ng-show="seatOccupant !== 'Free' && !editingOccupant", ng-click="makeFreeSeatModal = true" title="make this place free")
+							.seat-info__input-wrap(ng-show="editingOccupant")
+								i.icon-search.seat-info__sign
+								input(type="text", ng-model="seatOccupant", ng-change="searchChanged(seatOccupant)").seat-info__input
+
+							.persons(ng-show="showHints && editingOccupant")
+								.persons__triangle
+								p.persons__default-value no matches
+								.person(ng-repeat="person in persons | filter:seatOccupant", ng-click="assignNewOccupant(person)")
+									| {{person.name}}
+
+						.make-free-confirmation.window(ng-show="makeFreeSeatModal")
+							i.btn-close.icon-cancel-sign(ng-click="makeFreeSeatModal=false")
+							.window__content
+								p.window__text Do you really want to make this seat free?
+								button.window__btn.button.button--inversion(ng-click="makeFreeSeatModal = false; makeSeatFree()") Yes
+								button.window__btn.button.button--inversion(ng-click="makeFreeSeatModal=false") No
+
+					button(ng-click="confirmationDeleteSeat = true").seat-info__btn.button.button--inversion Delete seat
+					.delete-confirmation.window(ng-show="confirmationDeleteSeat")
+						i.btn-close.icon-cancel-sign(ng-click="confirmationDeleteSeat=false")
+						.window__content
+							p.window__text Do you really want to delete this seat?
+							button.window__btn.button.button--inversion(ng-click="deleteSeat(); confirmationDeleteSeat=false") Yes
+							button.window__btn.button.button--inversion(ng-click="confirmationDeleteSeat=false") No
+
+			form().search
+				fieldset.search__input-wrap
+					i.search__icon.icon-search
+					input(type="text", ng-model="searchUser", placeholder="Search" , ng-change="searchUsersChanged(searchUser)", ng-focus="searchUsersChanged(searchUser)").search__input
+					.search__variants(ng-show="showUsers")
+						.search__triangle
+						p.search__default-value no matches
+						p(ng-repeat="person in persons | filter:searchUser | filter:{seatId: filterFree}", ng-click="focussedPerson(person)").search__variant
+							| {{person.name}}
+
+				fieldset.search__checkbox-wrap
+					input#checkbox01(type='checkbox', ng-model="freeOnly", ng-click="changeFilter()" , name='checkbox')
+					label(for='checkbox01') Without seat
+	
+			//person popup
+			.person-info(ng-show="personInfo")
+				.window__close.btn-close.icon-cancel-sign(ng-click="personInfo = false")
+				.person-info__media-wrap
+					img(src="img/person2.jpg", alt="person photo").person-info__media
+				.person-info__details
+					.person-info__elem
+						span.person-info__key
+							|Occupant name:
+						span.person-info__value
+							|{{currentUser.name}}
+					.person-info__elem
+						span.person-info__key
+							|Occupant email:
+						span.person-info__value
+							|{{currentUser.email}}
+					.person-info__elem
+						span.person-info__key
+							|Occupant seat:
+						span.person-info__value
+							|{{currentUser.seatId}}
+						i(ng-click="makeFreeModal = true", title="make this person free", ng-show="currentUser.seatId !=='Free'").person-info__delete.icon-cancel-sign
+						.window(ng-show="makeFreeModal").modal-confirm
+							i.btn-close.icon-cancel-sign(ng-click="makeFreeModal = false")
+							.window__content
+								.window__text.assign-modal__text
+									|Would you really like to make {{currentUser.name}} free ?
+								button(ng-click="removeFromPlace(); makeFreeModal = false").button.button--inversion.modal-confirm__btn Yes
+								button(ng-click="makeFreeModal = false").button.button--inversion.modal-confirm__btn No
+						button(ng-click="selectionMode = true").person-info__btn.button.button--inversion Assign
+						.assign-modal.window(ng-show="assignModal")
+							i.btn-close.icon-cancel-sign(ng-click="assignModal = false")
+							div(ng-hide="userWithoutSeat")
+								.window__content
+									.window__text.assign-modal__text
+										|This place is already occupied. Would you like to swap {{currentUser.name}} and {{currentPlace.occupant}}
+										| or you want to replace {{currentPlace.occupant}} ?
+									button.assign-modal__btn.button.button--inversion(ng-click="swapPersons()") Swap
+									button.assign-modal__btn.button.button--inversion(ng-click="replacePerson()") Replace
+							div(ng-show="userWithoutSeat")
+								.window__content
+									.window__text.assign-modal__text
+										|This place is already occupied. Would you like to replace {{currentPlace.occupant}} ?
+									button.assign-modal__btn.button.button--inversion(ng-click="replacePerson()") Replace
+
+						.hz-modal.window(ng-show="assignNewModal")
+							i.btn-close.icon-cancel-sign(ng-click="assignNewModal = false")
+							div(ng-hide="userWithoutSeat")
+								.window__content
+									.window__text.assign-modal__text
+										p.window__success Done!
+										| Would you like to assign new place for {{replacedPerson.name}} ?
+									button.assign-modal__btn.button.button--inversion(ng-click="assignNewSeat()") Yes
+									button.assign-modal__btn.button.button--inversion(ng-click="assignNewModal = false") No 
+

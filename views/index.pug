@@ -1,0 +1,25 @@
+doctype html
+html
+	head
+		// *** General page information ***
+		//if IE
+			meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		meta(charset='utf-8')
+		title scheme
+		// Mobile Specific Metas
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		// *** Fonts ***
+		link(href='https://fonts.googleapis.com/css?family=Raleway:300,400,400i,500,700', rel='stylesheet')
+		// icon-font
+		link(href='/fonts/icomoon/style.css', rel='stylesheet')
+	body
+		div(ng-view='')
+		// Footer block
+		footer.footer
+		// Fabric js
+		script(src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.8/fabric.min.js')
+		// Angular
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js')
+		// Angular-route
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js')
+		script(type='text/javascript', src='/js/bundle.js')

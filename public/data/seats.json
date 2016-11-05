@@ -1,0 +1,24 @@
+[
+	{
+		"left" : 100,
+		"top" : 150,
+		"id": 0,
+		"title": "manager seat",
+		"occupant": "Ivan Ivanov"
+	},
+	{
+		"left" : 150,
+		"top" : 120,
+		"id": 1,
+		"title": "secretary seat",
+		"occupant": "Nick Thompson"
+	},
+	{
+		"left" : 350,
+		"top" : 120,
+		"id": 2,
+		"title": "No title",
+		"occupant": "Free"
+	}
+
+]
