@@ -87,7 +87,7 @@ app.get('/templates/:template', homeController.angularTemplate);
 const Seat = require('./models/Seat');
 const Person = require('./models/Person');
 const User = require('./models/User');
-const userController = require('./controllers/User');
+const userController = require('./controllers/user');
 app.get('/json/seats', (req, res) => {
     Seat.find().exec((err, docs) => res.send(docs));
 });
