@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const docSchema = new mongoose.Schema({
+    id: Number,
     email: String,
     name: String,
     seatId: {

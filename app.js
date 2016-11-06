@@ -103,11 +103,17 @@ app.post('/new-seat', passportConfig.isAuthenticated, (req, res) => {
     res.send({type: 'success'});
 });
 app.post('/update-seat', passportConfig.isAuthenticated, (req, res) => {
-    console.log('req.body', req.body);
+    console.log('Seat body', req.body);
     Seat.findOne({id: req.body.id}).exec((err, doc) => {
         Object.assign(doc, req.body);
         doc.markModified('occupant');
         doc.save();
+        res.send({type: 'success'});
+    });
+});
+app.post('/remove-seat', passportConfig.isAuthenticated, (req, res) => {
+    Seat.findOne({id: req.body.id}).exec((err, doc) => {
+        doc.remove();
         res.send({type: 'success'});
     });
 });
@@ -117,6 +123,7 @@ app.post('/new-person', passportConfig.isAuthenticated, (req, res) => {
     res.send({type: 'success'});
 });
 app.post('/update-person', passportConfig.isAuthenticated, (req, res) => {
+    console.log('Person body', req.body);
     Person.findOne({id: req.body.id}).exec((err, doc) => {
         Object.assign(doc, req.body);
         doc.markModified('seatId');
@@ -142,22 +149,10 @@ app.listen(app.get('port'), () => {
 });
 
 /* Dumb DB */
-/*
-for (var i = 1; i <= 2; i++) {
-    var newPerson = new Person({
-        email: 'example@gmail.com',
-        name: i == 1 ? 'Ivan Ivanov' : 'Nick Thompson'
-    });
-    newPerson.save();
-
-    var newSeat = new Seat({
-        left: 100,
-        top: 150,
-        id: 0,
-        title: i == 1 ? 'manager seat' : 'secretary seat'
-    });
-    newSeat.save();
-}*/
+/*const async = require('async');
+ Person.find().exec((err, docs) => {
+ async.each(docs, (doc, callback) => { doc.remove(); callback() });
+ });*/
 User.findOne({email: 'admin'}).exec((err, user) => {
     if (!user) {
         new User({email: 'admin', password: 'admin'}).save();

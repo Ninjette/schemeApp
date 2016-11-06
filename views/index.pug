@@ -17,9 +17,13 @@ html
 		// Footer block
 		footer.footer
 		// Fabric js
-		script(src='http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.8/fabric.min.js')
+		script(src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.6.6/fabric.min.js")
 		// Angular
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js')
 		// Angular-route
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js')
 		script(type='text/javascript', src='/js/bundle.js')
+
+		if user
+			script.
+				var user = !{JSON.stringify(user)};

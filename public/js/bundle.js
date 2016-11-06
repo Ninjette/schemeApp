@@ -414,7 +414,7 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -423,7 +423,7 @@
 	function MapCtrl($scope, dataService, $http) {
 
 		var _this = this;
-		this.canvas = new fabric.Canvas('canvas-block', { selection: false });
+		this.canvas = new fabric.Canvas('canvas-block', { selection: false, hoverCursor: 'pointer' });
 		this.paramFree = null;
 		this.defaultColor = "#282736";
 		this.activeColor = "#F5842D";
@@ -449,6 +449,27 @@
 			}
 		};
 
+		$scope.movingDetect = function (event) {
+			if (event.target.top < 0) {
+				_this.canvas.getActiveObject().set({
+					'top': 10
+				});
+			} else if (event.target.top > 490) {
+				_this.canvas.getActiveObject().set({
+					'top': 490
+				});
+			}
+			if (event.target.left < 0) {
+				_this.canvas.getActiveObject().set({
+					'left': 10
+				});
+			} else if (event.target.left > 970) {
+				_this.canvas.getActiveObject().set({
+					'left': 970
+				});
+			}
+		};
+
 		$scope.blurTitle = function (title) {
 			$scope.editingTitle = false;
 			$scope.seats[$scope.currentEl].title = title;
@@ -465,7 +486,7 @@
 
 		$scope.changeCoords = function (event) {
 			var data = {
-				id: $scope.currentEl,
+				id: $scope.seats[$scope.currentEl].id,
 				left: event.target.left,
 				top: event.target.top
 			};
@@ -539,8 +560,8 @@
 			updatePerson($scope.persons[$scope.persons.indexOf($scope.currentUser)]);
 
 			//put new occupant on new place ($scope.seats array)
-			$scope.seats[$scope.currentPlace.id].occupant = $scope.currentUser.name; //db
-			updateSeat($scope.seats[$scope.currentPlace.id]);
+			$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name; //db
+			updateSeat($scope.seats[$scope.currentEl]);
 
 			$scope.assignNewModal = true;
 			$scope.selectionMode = false;
@@ -571,8 +592,8 @@
 			updatePerson($scope.persons[$scope.persons.indexOf($scope.currentUser)]);
 
 			//put new occupant on new plce($scope.seats array)
-			$scope.seats[$scope.currentPlace.id].occupant = $scope.currentUser.name; //db
-			updateSeat($scope.seats[$scope.currentPlace.id]);
+			$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name; //db
+			updateSeat($scope.seats[$scope.currentEl]);
 
 			$scope.selectionMode = false;
 			$scope.assignModal = false;
@@ -668,7 +689,6 @@
 			$scope.persons.forEach(function (person) {
 				if (person.name === currentOccupant) {
 					person.seatId = _this.paramFree; //db
-					console.log('person', person);
 					updatePerson(person);
 				}
 			});
@@ -707,6 +727,7 @@
 
 		$scope.deleteSeat = function () {
 			var placeOccupant = $scope.seats[$scope.currentEl].occupant;
+			$http.post('/remove-seat', { id: $scope.seats[$scope.currentEl].id });
 			if (placeOccupant !== _this.paramFree) {
 				$scope.makePersonFree(placeOccupant);
 			}
@@ -730,7 +751,9 @@
 						scaleX: 0.09,
 						hasBorders: false,
 						hasControls: false,
-						hasRotatingPoint: false
+						hasRotatingPoint: false,
+						lockMovementX: window.user ? false : true,
+						lockMovementY: window.user ? false : true
 					});
 					_this.canvas.add(elem);
 					itemsProcessed++;
@@ -851,6 +874,7 @@
 			_this.canvas.on({
 				'object:selected': $scope.selectedObject,
 				'object:modified': $scope.changeCoords,
+				'object:moving': $scope.movingDetect,
 				'mouse:down': function mouseDown(e) {
 					if (e.target) {
 						e.target.opacity = 0.5;

@@ -10,5 +10,5 @@ exports.index = (req, res) => {
 
 exports.angularTemplate = (req, res) => {
     req.params.template = req.params.template.replace('-', '/');
-    res.render('angular/' + req.params.template);
+    res.render('templates/' + req.params.template);
 };

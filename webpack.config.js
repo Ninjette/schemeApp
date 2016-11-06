@@ -48,20 +48,6 @@ module.exports = {
 			}
 		]
 	},
-	// plugins:[
-	// 	new HtmlWebpackPlugin({
-	// 		filename:'index.html',
-	// 		template: './src/templates/index.jade'
-	// 	}),
-	// 	new HtmlWebpackPlugin({
-	// 		filename:'item.html',
-	// 		template: './src/templates/item.jade'
-	// 	}),
-	// 	new HtmlWebpackPlugin({
-	// 		filename:'search.html',
-	// 		template: './src/templates/search.jade'
-	// 	})
-	// ]
 }
 if (NODE_ENV === "production"){
 	module.exports.plugins.push(
