@@ -2,14 +2,14 @@ body{
 	font-family: 'Raleway', sans-serif;
 }
 .wrapper{
-	// margin: auto;
 	min-width: 1140px;
-	// overflow: hidden;
 }
 /* Change browser autocomple styles */
-input:-webkit-autofill {
-	-webkit-box-shadow: 0 0 0px 1000px #4E4D5C inset;
-	-webkit-text-fill-color: #fff !important;
+.auth-wrap{
+	input:-webkit-autofill {
+		-webkit-box-shadow: 0 0 0px 1000px #4E4D5C inset;
+		-webkit-text-fill-color: #fff !important;
+	}
 }
 
 button:focus{

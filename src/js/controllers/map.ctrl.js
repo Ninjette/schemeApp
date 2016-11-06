@@ -56,24 +56,26 @@ export function MapCtrl($scope, dataService, $http) {
 
 	function updateSeat(data) {
 		$http.post('/update-seat', data);
+		console.log('update-seat', data);
 	}
 
 	function updatePerson(data) {
 		$http.post('/update-person', data);
+		console.log('update-person', data);
 	}
 
-	$scope.changeCoords = function (event) {
-		var data = {
-			id: $scope.seats[$scope.currentEl].id,
-			left: event.target.left,
-			top: event.target.top
-		};
-		Object.assign($scope.seats[$scope.currentEl], data);
+	$scope.changeCoordinates = function (event) {
+		let data = $scope.seats[$scope.currentEl];
+		data.left = event.target.left;
+		data.top = event.target.top;
+
 		updateSeat(data);
 	}
 
 	$scope.selectedObject = function(e) {
 		$scope.currentEl = _this.canvas.getObjects().indexOf(e.target);
+		console.log(_this.canvas.getObjects());
+		console.log($scope.currentEl);
 		if ( $scope.selectionMode ) {
 			_this.selectionModeHandler();
 		} else {
@@ -119,7 +121,7 @@ export function MapCtrl($scope, dataService, $http) {
 
 	$scope.replacePerson = function() {
 		//make old occupant free ($scope.persons array)
-		$scope.persons.map(function(person){
+		$scope.persons.forEach(function(person){
 			if( person.name === $scope.currentPlace.occupant ){
 				person.seatId = _this.paramFree;//db
 				$scope.replacedPerson = person;
@@ -158,7 +160,7 @@ export function MapCtrl($scope, dataService, $http) {
 		//put old occupant on old place ($scope.persons array)
 		let oldPlace = $scope.currentUser.seatId;
 
-		$scope.persons.map(function(person){
+		$scope.persons.forEach(function(person){
 			if (person.name === $scope.currentPlace.occupant) {
 				person.seatId = $scope.seats[$scope.currentUser.seatId].id;//db old place
 				updatePerson(person);
@@ -288,7 +290,7 @@ export function MapCtrl($scope, dataService, $http) {
 			//old occupant сделай бомжом
 			$scope.makePersonFree($scope.oldOccupant);
 
-			$scope.persons.map(function(person){
+			$scope.persons.forEach(function(person){
 				if (person.name === newOccupant.name) {
 					if (person.seatId !== _this.paramFree) {
 						// проверка был ли такой чувак на месте. Если да, то в этом месте, то нужно сделать место free
@@ -319,7 +321,7 @@ export function MapCtrl($scope, dataService, $http) {
 
 	$scope.displaySeats = function(){
 		let itemsProcessed = 0;
-		$scope.seats.map(function(seat, index, array){
+		$scope.seats.forEach(function(seat, index, array){
 			fabric.loadSVGFromURL(_this.svgSrc, function(objects, options) { 
 				let seatId = seat.id;
 				let elem = fabric.util.groupSVGElements(objects, options);
@@ -336,13 +338,15 @@ export function MapCtrl($scope, dataService, $http) {
 					lockMovementX: window.user ? false: true,
 					lockMovementY: window.user ? false: true
 				});
-				_this.canvas.add(elem);
-				itemsProcessed++;
-				if(itemsProcessed === array.length){
-					// _this.canvas.calcOffset();
-					// _this.canvas.renderAll();
-					_this.assignColors();
-				}
+				setTimeout(function(){
+					_this.canvas.add(elem);
+					itemsProcessed++;
+					if(itemsProcessed === array.length){
+						// _this.canvas.calcOffset();
+						// _this.canvas.renderAll();
+						_this.assignColors();
+					}
+				}, index * 100)
 			});
 		});
 	}
@@ -360,7 +364,7 @@ export function MapCtrl($scope, dataService, $http) {
 	});
 
 	this.assignColors = function(){
-		$scope.seats.map(function(seat, index){
+		$scope.seats.forEach(function(seat, index){
 			if (seat.occupant === _this.paramFree) {
 				_this.canvas._objects[index].set({
 					fill: _this.defaultColor
@@ -440,16 +444,18 @@ export function MapCtrl($scope, dataService, $http) {
 	this.initFunc = function() {
 		dataService.getPersons(function(response) {
 			$scope.persons = response.data;
+			console.log($scope.persons);
 		});
 
 		dataService.getSeats(function(response) {
 			$scope.seats = response.data;
+			console.log($scope.seats);
 			$scope.displaySeats();
 		});
 
 		_this.canvas.on({
 			'object:selected': $scope.selectedObject,
-			'object:modified': $scope.changeCoords,
+			'object:modified': $scope.changeCoordinates,
 			'object:moving': $scope.movingDetect,
 			'mouse:down': function(e) {
 				if (e.target) {
