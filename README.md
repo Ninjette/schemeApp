@@ -1,3 +1,3 @@
-In order to sign in as admin:
-	Login: admin
-	Password admin
+In order to <b>sign in as admin</b>: </br>
+Login: admin</br>
+Password: admin
