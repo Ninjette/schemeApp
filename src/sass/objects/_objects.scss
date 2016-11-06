@@ -383,6 +383,15 @@
 	}
 }
 
+.untouchable-cover{
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 10;
+}
+
 .modal-confirm{
 	&__btn{
 		height: 30px;

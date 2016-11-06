@@ -170,6 +170,7 @@ div
 				| to close selection mode
 		.floor-plan
 			img.floor-plan__media(src='img/floor.svg', alt='floor-plan')
+			cover(ng-show="coverShow").untouchable-cover
 			canvas#canvas-block(width='1000', height='520')
 	.toster(ng-show="showToster")
 		i.icon-checked.toster__icon

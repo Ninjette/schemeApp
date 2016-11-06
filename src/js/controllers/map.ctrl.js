@@ -7,6 +7,7 @@ export function MapCtrl($scope, dataService, $http) {
 	this.activeColor = "#F5842D";
 	this.passiveColor = "#B4B4B4";
 	this.svgSrc = "img/dot-icon.svg";
+	$scope.coverShow = true;
 
 	$scope.safeApply = function(fn) {
 		let phase = this.$root.$$phase;
@@ -331,6 +332,8 @@ export function MapCtrl($scope, dataService, $http) {
 					itemsProcessed++;
 					if(itemsProcessed === array.length){
 						_this.assignColors();
+						$scope.coverShow = false;
+						$scope.safeApply();
 					}
 				}, index * 100)
 			});
