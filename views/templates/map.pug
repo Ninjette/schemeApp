@@ -37,7 +37,8 @@ div
 						| in order to cancel creating new seat
 					.seat-info(ng-show='showSeatInfo')
 						.seat-info__close.btn-close.icon-cancel-sign(ng-click='closeSeatInfo()')
-						.seat-info__icon seat icon
+						.seat-info__icon-wrap
+							img(src='img/dot-icon.svg', alt='seat icon').seat-info__icon
 						.seat-info__details
 							fieldset.seat-info__fieldset
 								span.seat-info__key Seat title:
@@ -102,7 +103,7 @@ div
 				.person-info(ng-show='personInfo')
 					.window__close.btn-close.icon-cancel-sign(ng-click='personInfo = false')
 					.person-info__media-wrap
-						img.person-info__media(src='img/person2.jpg', alt='person photo')
+						img.person-info__media(src='img/person.jpg', alt='person photo')
 					.person-info__details
 						.person-info__elem
 							span.person-info__key Occupant name:
@@ -170,3 +171,6 @@ div
 		.floor-plan
 			img.floor-plan__media(src='img/floor.svg', alt='floor-plan')
 			canvas#canvas-block(width='1000', height='520')
+	.toster(ng-show="showToster")
+		i.icon-checked.toster__icon
+		p.toster__message {{tosterMessage}}

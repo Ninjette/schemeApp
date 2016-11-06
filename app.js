@@ -17,7 +17,7 @@ const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 
 /**
- * Load environment variables from .env file, where API keys and passwords are configured.
+ * Load environment variables from .env file
  */
 dotenv.load({ path: '.env.example' });
 
@@ -103,7 +103,6 @@ app.post('/new-seat', passportConfig.isAuthenticated, (req, res) => {
 	res.send({type: 'success'});
 });
 app.post('/update-seat', passportConfig.isAuthenticated, (req, res) => {
-	console.log('Seat body', req.body);
 	Seat.findOne({id: req.body.id}).exec((err, doc) => {
 		Object.assign(doc, req.body);
 		doc.markModified('occupant');
@@ -123,7 +122,6 @@ app.post('/new-person', passportConfig.isAuthenticated, (req, res) => {
 	res.send({type: 'success'});
 });
 app.post('/update-person', passportConfig.isAuthenticated, (req, res) => {
-	console.log('Person body', req.body);
 	Person.findOne({id: req.body.id}).exec((err, doc) => {
 		Object.assign(doc, req.body);
 		doc.markModified('seatId');
@@ -147,12 +145,6 @@ app.use(errorHandler());
 app.listen(app.get('port'), () => {
 	console.log('%s Express server listening on port %d in %s mode.', chalk.green('✓'), app.get('port'), app.get('env'));
 });
-
-/* Dumb DB */
-const async = require('async');
- Person.find().exec((err, docs) => {
- async.each(docs, (doc, callback) => { doc.remove(); callback() });
- });
 
 User.findOne({email: 'admin'}).exec((err, user) => {
 	if (!user) {

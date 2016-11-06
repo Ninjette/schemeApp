@@ -56,12 +56,10 @@ export function MapCtrl($scope, dataService, $http) {
 
 	function updateSeat(data) {
 		$http.post('/update-seat', data);
-		console.log('update-seat', data);
 	}
 
 	function updatePerson(data) {
 		$http.post('/update-person', data);
-		console.log('update-person', data);
 	}
 
 	$scope.changeCoordinates = function (event) {
@@ -74,8 +72,6 @@ export function MapCtrl($scope, dataService, $http) {
 
 	$scope.selectedObject = function(e) {
 		$scope.currentEl = _this.canvas.getObjects().indexOf(e.target);
-		console.log(_this.canvas.getObjects());
-		console.log($scope.currentEl);
 		if ( $scope.selectionMode ) {
 			_this.selectionModeHandler();
 		} else {
@@ -95,91 +91,89 @@ export function MapCtrl($scope, dataService, $http) {
 		}
 
 		if ($scope.seats[$scope.currentEl].occupant == _this.paramFree) {
-			//make previous place free if it was occupanted by him.
 			if ($scope.currentUser.seatId !== _this.paramFree) {
 				$scope.seats[$scope.currentUser.seatId].occupant = _this.paramFree;//db
 				updateSeat($scope.seats[$scope.currentUser.seatId]);
 			}
 
-			//current user put on choosen place
 			$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name;//db
 			updateSeat($scope.seats[$scope.currentEl]);
 			$scope.selectionMode = false;
 
-			//закрепить место за ним в массиве $scope.persons
 			$scope.persons[$scope.persons.indexOf($scope.currentUser)].seatId = $scope.currentEl;//db
 			updatePerson($scope.persons[$scope.persons.indexOf($scope.currentUser)]);
 
 			_this.canvas.setActiveObject(_this.canvas.item($scope.currentEl));
+			$scope.displayToster($scope.currentUser.name +' assigned successfully');
 			$scope.safeApply();
 		} else {
-			$scope.currentPlace = $scope.seats[$scope.currentEl];//db
+			$scope.currentPlace = $scope.seats[$scope.currentEl];
 			$scope.assignModal = true;
 			$scope.safeApply();
 		};
 	}
 
 	$scope.replacePerson = function() {
-		//make old occupant free ($scope.persons array)
 		$scope.persons.forEach(function(person){
 			if( person.name === $scope.currentPlace.occupant ){
-				person.seatId = _this.paramFree;//db
+				person.seatId = _this.paramFree;
 				$scope.replacedPerson = person;
 				updatePerson(person);
 			}
 		})
 
 		if (!$scope.userWithoutSeat) {
-			// make old occupant free ($scope.seats array)
-			$scope.seats[$scope.currentUser.seatId].occupant = _this.paramFree;//db
+			$scope.seats[$scope.currentUser.seatId].occupant = _this.paramFree;
 			updateSeat($scope.seats[$scope.currentUser.seatId]);
 		}
 
-		//put new occupant on new place ($scope.persons array)
-		$scope.persons[$scope.persons.indexOf($scope.currentUser)].seatId = $scope.currentPlace.id;//db
+		$scope.persons[$scope.persons.indexOf($scope.currentUser)].seatId = $scope.currentPlace.id;
 		updatePerson($scope.persons[$scope.persons.indexOf($scope.currentUser)]);
 
-		//put new occupant on new place ($scope.seats array)
-		$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name;//db
+		$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name;
 		updateSeat($scope.seats[$scope.currentEl]);
 
 		$scope.assignNewModal = true;
 		$scope.selectionMode = false;
 		$scope.assignModal = false;
 
-		//highlight active element
 		_this.canvas.setActiveObject(_this.canvas.item($scope.currentEl));
+		$scope.displayToster($scope.replacedPerson.name + ' replaced successfully');
 	}
 
 	$scope.swapPersons = function(){
 
-		//put old occupant on old place ($scope.seats array)
 		$scope.seats[$scope.currentUser.seatId].occupant = $scope.currentPlace.occupant;
 		updateSeat($scope.seats[$scope.currentUser.seatId]);
 
-		//put old occupant on old place ($scope.persons array)
 		let oldPlace = $scope.currentUser.seatId;
 
 		$scope.persons.forEach(function(person){
 			if (person.name === $scope.currentPlace.occupant) {
-				person.seatId = $scope.seats[$scope.currentUser.seatId].id;//db old place
+				person.seatId = $scope.seats[$scope.currentUser.seatId].id;
 				updatePerson(person);
 			}
 		})
 
-		//put new occupant on new place ($scope.persons array)
 		$scope.persons[$scope.persons.indexOf($scope.currentUser)].seatId = $scope.currentPlace.id;
 		updatePerson($scope.persons[$scope.persons.indexOf($scope.currentUser)]);
 
-
-		//put new occupant on new plce($scope.seats array)
 		$scope.seats[$scope.currentEl].occupant = $scope.currentUser.name;//db
 		updateSeat($scope.seats[$scope.currentEl]);
 
 		$scope.selectionMode = false;
 		$scope.assignModal = false;
-		//highlight active element
 		_this.canvas.setActiveObject(_this.canvas.item($scope.currentEl));
+		$scope.displayToster('persons swapped successfully');
+	}
+
+	$scope.displayToster = function(message){
+		$scope.tosterMessage = message;
+		$scope.showToster = true;
+		setTimeout(function(){
+			$scope.showToster = false;
+			$scope.safeApply();
+		},4000)
 	}
 
 
@@ -206,8 +200,6 @@ export function MapCtrl($scope, dataService, $http) {
 
 	this.highlightActive = function(){
 		this.assignColors();
-
-		// highlight active element
 		_this.canvas._objects[$scope.currentEl].set({
 			fill: _this.activeColor
 		})
@@ -227,7 +219,7 @@ export function MapCtrl($scope, dataService, $http) {
 		$scope.currentUser = person;
 
 		let hasSeat = person.seatId;
-		if (hasSeat !== _this.paramFree){ // if person doesn't have seat
+		if (hasSeat !== _this.paramFree){
 			_this.canvas.setActiveObject(_this.canvas.item(person.seatId));
 		} else {
 			$scope.discardActiveElement();
@@ -255,7 +247,7 @@ export function MapCtrl($scope, dataService, $http) {
 	$scope.makeSeatFree = function(){
 		$scope.seatOccupant = _this.paramFree;
 		let placeOccupant = $scope.seats[$scope.currentEl].occupant;
-		$scope.seats[$scope.currentEl].occupant = _this.paramFree; //db
+		$scope.seats[$scope.currentEl].occupant = _this.paramFree;
 		updateSeat($scope.seats[$scope.currentEl]);
 
 		$scope.makePersonFree(placeOccupant);
@@ -264,21 +256,20 @@ export function MapCtrl($scope, dataService, $http) {
 	$scope.removeFromPlace = function(){
 		$scope.seats[$scope.currentUser.seatId].occupant = _this.paramFree;//db
 		updateSeat($scope.seats[$scope.currentUser.seatId]);
-		$scope.makePersonFree($scope.currentUser.name);//db
+		$scope.makePersonFree($scope.currentUser.name);
 		$scope.discardActiveElement();
 	}
 
 	$scope.makePersonFree = function(currentOccupant){
 		$scope.persons.forEach(function(person) {
 			if(person.name === currentOccupant) {
-				person.seatId = _this.paramFree; //db
+				person.seatId = _this.paramFree;
 				updatePerson(person);
 			}
 		})
 	}
 
 	$scope.rememberOldOccupant = function(){
-		// $scope.assignedValue = false;
 		$scope.oldOccupant = $scope.seatOccupant;
 	}
 
@@ -287,21 +278,18 @@ export function MapCtrl($scope, dataService, $http) {
 		$scope.editingOccupant = false;
 
 		if ($scope.oldOccupant !== newOccupant.name){
-			//old occupant сделай бомжом
 			$scope.makePersonFree($scope.oldOccupant);
 
 			$scope.persons.forEach(function(person){
 				if (person.name === newOccupant.name) {
 					if (person.seatId !== _this.paramFree) {
-						// проверка был ли такой чувак на месте. Если да, то в этом месте, то нужно сделать место free
-						person.occupant = _this.paramFree; //db
+						person.occupant = _this.paramFree;
 					}
-					person.seatId = $scope.currentEl; //db
+					person.seatId = $scope.currentEl;
 					updatePerson(person);
 				}
 			})
 
-			// это место.occupant = person.name;
 			$scope.seats[$scope.currentEl].occupant = newOccupant.name;
 
 			updateSeat($scope.seats[$scope.currentEl]);
@@ -314,7 +302,7 @@ export function MapCtrl($scope, dataService, $http) {
 		if(placeOccupant !== _this.paramFree){
 			$scope.makePersonFree(placeOccupant)
 		}
-		$scope.seats.splice($scope.currentEl, 1); //db
+		$scope.seats.splice($scope.currentEl, 1);
 		$scope.showSeatInfo = false;
 		_this.canvas.getActiveObject().remove();
 	};
@@ -330,8 +318,8 @@ export function MapCtrl($scope, dataService, $http) {
 					left: seat.left,
 					top: seat.top,
 					fill: _this.defaultColor,
-					scaleY: 0.09,
-					scaleX: 0.09,
+					scaleY: 0.08,
+					scaleX: 0.08,
 					hasBorders: false,
 					hasControls: false,
 					hasRotatingPoint: false,
@@ -342,8 +330,6 @@ export function MapCtrl($scope, dataService, $http) {
 					_this.canvas.add(elem);
 					itemsProcessed++;
 					if(itemsProcessed === array.length){
-						// _this.canvas.calcOffset();
-						// _this.canvas.renderAll();
 						_this.assignColors();
 					}
 				}, index * 100)
@@ -388,9 +374,9 @@ export function MapCtrl($scope, dataService, $http) {
 				"occupant": _this.paramFree
 			};
 
-			$http.post('/new-seat', data);
 
-			$scope.seats.push(data); //db
+			$scope.seats.push(data);
+			$http.post('/new-seat', data);
 			$scope.newSeatMode = false;
 			$scope.showSeatInfo = true;
 			$scope.currentEl = $scope.seats.length - 1;
@@ -404,8 +390,8 @@ export function MapCtrl($scope, dataService, $http) {
 					id: newSeatId,
 					left: event.offsetX-12,
 					top: event.offsetY-12,
-					scaleY: 0.09,
-					scaleX: 0.09,
+					scaleY: 0.08,
+					scaleX: 0.08,
 					hasBorders: false,
 					hasControls: false,
 					hasRotatingPoint: false
@@ -444,12 +430,10 @@ export function MapCtrl($scope, dataService, $http) {
 	this.initFunc = function() {
 		dataService.getPersons(function(response) {
 			$scope.persons = response.data;
-			console.log($scope.persons);
 		});
 
 		dataService.getSeats(function(response) {
 			$scope.seats = response.data;
-			console.log($scope.seats);
 			$scope.displaySeats();
 		});
 
