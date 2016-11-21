@@ -19,3 +19,14 @@ Instructions
 <li>as admin you can remove seat from the floor. If there is an occupant, he will lose a seat.</li>
 <li>as admin you can create/remove floor configuration on admin page</li>
 </ul>
+
+Used technologies
+<ul>
+	<li>Angular</li>
+	<li>NodeJs</li>
+	<li>Mongo</li>
+	<li>Webpack</li>
+	<li>Express</li>
+	<li>Jade</li>
+	<li>SCSS</li>
+</ul>
