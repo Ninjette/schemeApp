@@ -6,7 +6,7 @@ login: admin
 password: admin
 
 <hr/>
-Instructions
+<h3>Instructions</h3>
 <ul>
 <li>as admin/user you can search employees using the search panel</li>
 <li>as admin/user you can see employee details in the popup</li>
@@ -20,7 +20,7 @@ Instructions
 <li>as admin you can create/remove floor configuration on admin page</li>
 </ul>
 
-Used technologies
+<h3>Used technologies</h3>
 <ul>
 	<li>Angular</li>
 	<li>NodeJs</li>
