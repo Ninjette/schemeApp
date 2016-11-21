@@ -5,7 +5,7 @@ login: admin
 <br/>
 password: admin
 
-
+<hr/>
 Instructions
 <ul>
 <li>as admin/user you can search employees using the search panel</li>
